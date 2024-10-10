@@ -16,27 +16,25 @@ class ListPage extends StatefulWidget {
 
 class PhoneDialer {
   static Future<void> makePhoneCall(String phoneNumber) async {
-    final url = Uri(scheme: 'tel', path: phoneNumber);
-
-    // ตรวจสอบและขออนุญาต
-    var status = await Permission.phone.status;
-    if (!status.isGranted) {
-      status = await Permission.phone.request();
-    }
+    // ตรวจสอบการอนุญาต
+    var status = await Permission.phone.request();
 
     if (status.isGranted) {
-      // เปิดแอปโทรศัพท์
+      // สร้าง URL สำหรับการโทร
+      final Uri url = Uri(scheme: 'tel', path: phoneNumber);
+
+      // ตรวจสอบว่า URL สามารถเปิดได้หรือไม่
       if (await canLaunchUrl(url)) {
         await launchUrl(url);
       } else {
-        print('Cannot launch dialer for URL: $url');
+        print('Could not launch dialer for URL: $url');
       }
     } else {
-      // ถ้าไม่อนุญาต
-      print('Permission to access phone not granted');
+      print('Permission denied: Phone call permission not granted');
     }
   }
 }
+
 
 class _ListPageState extends State<ListPage> {
   List users = [];
