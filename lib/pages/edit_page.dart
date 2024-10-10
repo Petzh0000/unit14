@@ -17,6 +17,8 @@ class _EditPageState extends State<EditPage> {
   // สร้าง Controller สำหรับควบคุมข้อมูลใน TextField
   late TextEditingController nameController;
   late TextEditingController emailController;
+  late TextEditingController nicknameController;
+  late TextEditingController phoneController;
   // ตัวแปรสำหรับควบคุมสถานะการโหลดและการเปลี่ยนแปลงข้อมูล
   bool isLoading = false;
   bool _hasChanges = false;
@@ -27,10 +29,13 @@ class _EditPageState extends State<EditPage> {
     // กำหนดค่าเริ่มต้นให้กับ Controller จากข้อมูลผู้ใช้ที่ได้รับ
     nameController = TextEditingController(text: widget.user['name']);
     emailController = TextEditingController(text: widget.user['email']);
-
+    nicknameController = TextEditingController(text: widget.user['nickname']);
+    phoneController = TextEditingController(text: widget.user['phone']);
     // เพิ่ม listener เพื่อตรวจสอบการเปลี่ยนแปลงข้อมูล
     nameController.addListener(_onTextChanged);
     emailController.addListener(_onTextChanged);
+    nicknameController.addListener(_onTextChanged);
+    phoneController.addListener(_onTextChanged);
   }
 
   @override
@@ -38,9 +43,13 @@ class _EditPageState extends State<EditPage> {
     // ลบ listener เมื่อไม่ได้ใช้งานแล้ว
     nameController.removeListener(_onTextChanged);
     emailController.removeListener(_onTextChanged);
+    nicknameController.removeListener(_onTextChanged);
+    phoneController.removeListener(_onTextChanged);
     // ทำลาย Controller เพื่อป้องกันการรั่วไหลของหน่วยความจำ
     nameController.dispose();
     emailController.dispose();
+    nicknameController.dispose();
+    phoneController.dispose();
     super.dispose();
   }
 
@@ -48,7 +57,9 @@ class _EditPageState extends State<EditPage> {
   void _onTextChanged() {
     setState(() {
       _hasChanges = nameController.text != widget.user['name'] ||
-          emailController.text != widget.user['email'];
+          emailController.text != widget.user['email'] ||
+          nicknameController.text != widget.user['nickname'] ||
+          phoneController.text != widget.user['phone'];
     });
   }
 
@@ -78,6 +89,8 @@ class _EditPageState extends State<EditPage> {
             'id': widget.user['id'],
             'name': nameController.text.trim(),
             'email': emailController.text.trim(),
+            'nickname': nicknameController.text.trim(),
+            'phone': phoneController.text.trim()
           }),
           headers: {"Content-Type": "application/json"},
         );
@@ -154,6 +167,25 @@ class _EditPageState extends State<EditPage> {
                           },
                         ),
                         SizedBox(height: 16),
+
+                        // ช่องกรอกชื่อเล่น
+                        TextFormField(
+                          controller: nicknameController,
+                          decoration: InputDecoration(
+                            labelText: 'ชื่อเล่น',
+                            prefixIcon: Icon(Icons.person),
+                            border: OutlineInputBorder(),
+                          ),
+                          // ตรวจสอบความถูกต้องของข้อมูล
+                          validator: (value) {
+                            if (value == null || value.trim().isEmpty) {
+                              return 'กรุณากรอกชื่อเล่น';
+                            }
+                            return null;
+                          },
+                        ),
+                        SizedBox(height: 16),
+
                         // ช่องกรอกอีเมล
                         TextFormField(
                           controller: emailController,
@@ -173,11 +205,33 @@ class _EditPageState extends State<EditPage> {
                             return null;
                           },
                         ),
+                        SizedBox(height: 16),
+
+                        // ช่องกรอกเบอร์โทร
+                        TextFormField(
+                          controller: phoneController,
+                          decoration: InputDecoration(
+                            labelText: 'เบอร์โทร',
+                            prefixIcon: Icon(Icons.phone),
+                            border: OutlineInputBorder(),
+                          ),
+                          // ตรวจสอบความถูกต้องของเบอร์โทร
+                          validator: (value) {
+                            if (value == null || value.trim().isEmpty) {
+                              return 'กรุณากรอกเบอร์โทร';
+                            }
+                            if (!RegExp(r"^[0-9]+").hasMatch(value)) {
+                              return 'กรุณากรอกเบอร์โทรที่ถูกต้อง';
+                            }
+                            return null;
+                          },
+                        ),
                       ],
                     ),
                   ),
                 ),
                 SizedBox(height: 24),
+
                 // ปุ่มบันทึกการแก้ไข
                 ElevatedButton(
                   onPressed: isLoading ? null : updateUser,

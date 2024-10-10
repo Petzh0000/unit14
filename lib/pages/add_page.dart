@@ -15,6 +15,8 @@ class _AddPageState extends State<AddPage> {
   // สร้าง Controller สำหรับควบคุมข้อมูลใน TextField
   final _nameController = TextEditingController();
   final _emailController = TextEditingController();
+  final _phoneController = TextEditingController();
+  final _nicknameController = TextEditingController();
   // ตัวแปรสำหรับควบคุมสถานะการโหลด
   bool _isLoading = false;
 
@@ -31,6 +33,8 @@ class _AddPageState extends State<AddPage> {
         final data = {
           "name": _nameController.text.trim(),
           "email": _emailController.text.trim(),
+          "nickname": _nicknameController.text.trim(),
+          "phone": _phoneController.text.trim(),
         };
 
         // ส่งข้อมูลไปยัง API
@@ -112,6 +116,23 @@ class _AddPageState extends State<AddPage> {
                           },
                         ),
                         SizedBox(height: 16),
+
+                        TextFormField(
+                          controller: _nicknameController,
+                          decoration: InputDecoration(
+                            labelText: 'ชื่อเล่น',
+                            prefixIcon: Icon(Icons.person),
+                            border: OutlineInputBorder(),
+                          ),
+                          // ตรวจสอบความถูกต้องของข้อมูล
+                          validator: (value) {
+                            if (value == null || value.trim().isEmpty) {
+                              return 'กรุณากรอกชื่อเล่น';
+                            }
+                            return null;
+                          },
+                        ),
+                        SizedBox(height: 16),
                         // ช่องกรอกอีเมล
                         TextFormField(
                           controller: _emailController,
@@ -127,6 +148,26 @@ class _AddPageState extends State<AddPage> {
                             }
                             if (!RegExp(r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+").hasMatch(value)) {
                               return 'กรุณากรอกอีเมลที่ถูกต้อง';
+                            }
+                            return null;
+                          },
+                        ),
+                        SizedBox(height: 16),
+                        // ช่องกรอกอีเมล
+                        TextFormField(
+                          controller: _phoneController,
+                          decoration: InputDecoration(
+                            labelText: 'เบอร์โทร',
+                            prefixIcon: Icon(Icons.phone),
+                            border: OutlineInputBorder(),
+                          ),
+                          // ตรวจสอบความถูกต้องของอีเมล
+                          validator: (value) {
+                            if (value == null || value.trim().isEmpty) {
+                              return 'กรุณากรอกเบอร์โทร';
+                            }
+                            if (!RegExp(r"^[0-9]+").hasMatch(value)) {
+                              return 'กรุณากรอกเบอร์โทรที่ถูกต้อง';
                             }
                             return null;
                           },
